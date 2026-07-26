@@ -18,7 +18,7 @@ class CalculatorTest {
 
 	@Test
 	void subtractReturnsDifference() {
-		assertEquals(12, calculator.subtract(5, 3));
+		assertEquals(2, calculator.subtract(5, 3));
 	}
 
 	@Test
@@ -184,6 +184,129 @@ class CalculatorTest {
 	@Test
 	void percentageTotalZero() {
 		assertEquals(0.0, calculator.percentage(0, 50));
+	}
+
+
+
+	// --- Financial methods tests (Issue #5) ---
+	// PMT tests
+
+	@Test
+	void pmtNormalCase() {
+		assertEquals(-5368.22, calculator.pmt(0.05 / 12, 360, 1000000, 0, false), 1e-2);
+	}
+
+	@Test
+	void pmtRateZero() {
+		assertEquals(-833.33, calculator.pmt(0, 12, 10000, 0, false), 1e-2);
+	}
+
+	@Test
+	void pmtDueTrue() {
+		assertEquals(-5345.94, calculator.pmt(0.05 / 12, 360, 1000000, 0, true), 1e-2);
+	}
+
+	@Test
+	void pmtWithFv() {
+		assertEquals(-977.29, calculator.pmt(0.05 / 12, 12, 0, 12000, false), 1e-2);
+	}
+
+	@Test
+	void pmtNegativeNperThrows() {
+		assertThrows(IllegalArgumentException.class,
+				() -> calculator.pmt(0.05, -1, 10000, 0, false));
+	}
+
+	// FV tests
+
+	@Test
+	void fvNormalCase() {
+		assertEquals(610.51, calculator.fv(0.1, 5, -100, 0, false), 1e-2);
+	}
+
+	@Test
+	void fvRateZero() {
+		assertEquals(-1000.0, calculator.fv(0, 5, 200, 0, false), 1e-2);
+	}
+
+	@Test
+	void fvDueTrue() {
+		assertEquals(671.56, calculator.fv(0.1, 5, -100, 0, true), 1e-2);
+	}
+
+	@Test
+	void fvWithPv() {
+		assertEquals(3831.53, calculator.fv(0.1, 5, -100, -2000, false), 1e-2);
+	}
+
+	@Test
+	void fvNegativeNperThrows() {
+		assertThrows(IllegalArgumentException.class,
+				() -> calculator.fv(0.05, -1, -100, 1000, false));
+	}
+
+	// NPV tests
+
+	@Test
+	void npvNormalCase() {
+		assertEquals(1188.44, calculator.npv(0.1, -10000, 3000, 4200, 6800), 1e-2);
+	}
+
+	@Test
+	void npvSecondCase() {
+		assertEquals(42.52, calculator.npv(0.05, -500, 200, 200, 200), 1e-2);
+	}
+
+	@Test
+	void npvEmptyCashflowsThrows() {
+		assertThrows(IllegalArgumentException.class,
+				() -> calculator.npv(0.1));
+	}
+
+	@Test
+	void npvSingleCashflow() {
+		assertEquals(-909.09, calculator.npv(0.1, -1000), 1e-2);
+	}
+
+	// SLN tests
+
+	@Test
+	void slnNormalCase() {
+		assertEquals(2250.0, calculator.sln(30000, 7500, 10), 1e-2);
+	}
+
+	@Test
+	void slnSecondCase() {
+		assertEquals(180.0, calculator.sln(1000, 100, 5), 1e-2);
+	}
+
+	@Test
+	void slnZeroLifeThrows() {
+		assertThrows(IllegalArgumentException.class,
+				() -> calculator.sln(1000, 100, 0));
+	}
+
+	// compoundInterest tests
+
+	@Test
+	void compoundInterestNormalCase() {
+		assertEquals(1157.625, calculator.compoundInterest(1000, 0.05, 3), 1e-10);
+	}
+
+	@Test
+	void compoundInterestZeroPeriods() {
+		assertEquals(1000.0, calculator.compoundInterest(1000, 0.05, 0), 1e-10);
+	}
+
+	@Test
+	void compoundInterestZeroRate() {
+		assertEquals(1000.0, calculator.compoundInterest(1000, 0, 5), 1e-10);
+	}
+
+	@Test
+	void compoundInterestNegativePeriodsThrows() {
+		assertThrows(IllegalArgumentException.class,
+				() -> calculator.compoundInterest(1000, 0.05, -1));
 	}
 
 }

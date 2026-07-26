@@ -60,4 +60,62 @@ public class Calculator {
 		return total * percent / 100;
 	}
 
+
+
+	// --- Financial methods (Issue #5) ---
+
+	public double pmt(double rate, int nper, double pv, double fv, boolean due) {
+		if (nper <= 0) {
+			throw new IllegalArgumentException("nper must be positive");
+		}
+		if (rate == 0) {
+			return -(pv + fv) / nper;
+		}
+		double factor = Math.pow(1 + rate, nper);
+		double pmt = -rate * (fv + factor * pv) / (factor - 1);
+		if (due) {
+			pmt /= (1 + rate);
+		}
+		return pmt;
+	}
+
+	public double fv(double rate, int nper, double pmt, double pv, boolean due) {
+		if (nper <= 0) {
+			throw new IllegalArgumentException("nper must be positive");
+		}
+		if (rate == 0) {
+			return -(pv + pmt * nper);
+		}
+		double factor = Math.pow(1 + rate, nper);
+		if (due) {
+			return -(pv * factor + pmt * (1 + rate) * (factor - 1) / rate);
+		}
+		return -(pv * factor + pmt * (factor - 1) / rate);
+	}
+
+	public double npv(double rate, double... cashflows) {
+		if (cashflows.length == 0) {
+			throw new IllegalArgumentException("cashflows must not be empty");
+		}
+		double result = 0;
+		for (int i = 0; i < cashflows.length; i++) {
+			result += cashflows[i] / Math.pow(1 + rate, i + 1);
+		}
+		return result;
+	}
+
+	public double sln(double cost, double salvage, int life) {
+		if (life <= 0) {
+			throw new IllegalArgumentException("life must be positive");
+		}
+		return (cost - salvage) / life;
+	}
+
+	public double compoundInterest(double principal, double rate, int periods) {
+		if (periods < 0) {
+			throw new IllegalArgumentException("periods must be non-negative");
+		}
+		return principal * Math.pow(1 + rate, periods);
+	}
+
 }
